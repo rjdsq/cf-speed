@@ -162,40 +162,40 @@ def push_plus(content):
 
 def main():
     """主函数"""
-    # 检查必要的环境变量
     if not all([CF_API_TOKEN, CF_ZONE_ID, CF_DNS_NAME]):
         print("错误: 缺少必要的环境变量 (CF_API_TOKEN, CF_ZONE_ID, CF_DNS_NAME)")
         return
 
-    # 获取最新优选 IP
     ip_addresses_str = get_cf_speed_test_ip()
     if not ip_addresses_str:
         print("错误: 无法获取优选 IP")
         return
 
-    ip_addresses = [ip.strip() for ip in ip_addresses_str.split(',') if ip.strip()]
-    if not ip_addresses:
+    raw_ips = [ip.strip() for ip in ip_addresses_str.split(',') if ip.strip()]
+    if not raw_ips:
         print("错误: 未解析到有效 IP 地址")
         return
 
-    # 获取 DNS 记录
+    formatted_ips = [f"{ip}:443#Cloudflare" for ip in raw_ips]
+    
+    with open('top.txt', 'w') as f:
+        f.write(formatted_ips[0] if formatted_ips else "")
+
+    with open('top10.txt', 'w') as f:
+        f.write('\n'.join(formatted_ips[:10]))
+
     dns_records = get_dns_records(CF_DNS_NAME)
     if not dns_records:
         print(f"错误: 未找到 {CF_DNS_NAME} 的 DNS 记录")
         return
 
-    # 检查记录数量是否足够
-    if len(ip_addresses) > len(dns_records):
-        print(f"警告: IP 数量({len(ip_addresses)})超过 DNS 记录数量({len(dns_records)})，只更新前 {len(dns_records)} 个")
-        ip_addresses = ip_addresses[:len(dns_records)]
+    ip_addresses = raw_ips[:len(dns_records)] if len(raw_ips) > len(dns_records) else raw_ips
 
-    # 更新 DNS 记录
     push_plus_content = []
     for index, ip_address in enumerate(ip_addresses):
         dns = update_dns_record(dns_records[index], CF_DNS_NAME, ip_address)
         push_plus_content.append(dns)
 
-    # 发送推送
     if push_plus_content:
         push_plus('\n'.join(push_plus_content))
 
