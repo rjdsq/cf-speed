@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import json
 import traceback
 import time
@@ -121,10 +118,10 @@ def main():
 
     formatted_ips = [f"{ip}:443#Cloudflare" for ip in raw_ips]
     
-    with open('top.txt', 'w') as f:
+    with open('top.txt', 'w', encoding='utf-8') as f:
         f.write(formatted_ips[0] if formatted_ips else "")
 
-    with open('top10.txt', 'w') as f:
+    with open('sub.txt', 'w', encoding='utf-8') as f:
         f.write('\n'.join(formatted_ips[:10]))
 
     dns_records = get_dns_records(CF_DNS_NAME)
