@@ -39,22 +39,8 @@ jobs:
           echo "测速结果前 10 名："
           head -n 11 result.csv
 
-      - name: 'Set up Python'
-        uses: actions/setup-python@v5
+      - name: 'Upload Results (上传测速结果)'
+        uses: actions/upload-artifact@v4
         with:
-          python-version: 3.12
-
-      - name: 'Install dependencies'
-        run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: 'run dnscf'
-        env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
-          CF_DNS_NAME: ${{ secrets.CF_DNS_NAME }}
-          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: |
-          # 如果你的 dnscf.py 需要读取测速结果，请在 Python 代码中读取当前目录下的 result.csv
-          python dnscf.py
+          name: speedtest-result
+          path: result.csv
